@@ -105,6 +105,16 @@ class ProcessIDFile(object):
 			return False
 		return True
 
+	def signal(self, sig, check_running=True):
+		try:
+			process_id = self.fetch(check_running)
+		except Exception:
+			_log.exception("failed on fetching process-id (check_running=%r)", check_running)
+			process_id = None
+		if process_id is None:
+			return
+		os.kill(process_id, sig)
+
 	def remove(self):
 		try:
 			if not os.path.isfile(self.file_path):
