@@ -52,7 +52,7 @@ def main():
 		_log.info("emitted SIGHUP.")
 	pid_fp.save()
 	_log.info("save-ed ! waitt %d seconds before remove.", wait_before_remove)
-	for cnt in xrange(wait_before_remove):
+	for cnt in range(wait_before_remove):
 		if _CAUGHT_SIG:
 			_CAUGHT_SIG = 0
 			sys.stdout.write("\033[2K\r>> caught signal.\n")

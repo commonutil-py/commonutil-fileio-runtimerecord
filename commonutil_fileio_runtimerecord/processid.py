@@ -13,13 +13,10 @@ _log = logging.getLogger(__name__)
 def _digest_procfs_cmdline(proc_id):
 	p = "/proc/%d/cmdline" % (proc_id, )
 	try:
-		with open(p, "r") as fp:
+		with open(p, "rb") as fp:
 			l = fp.read()
-	except IOError as e:
-		if e.errno == errno.ENOENT:
-			return '-'
-		_log.exception("failed on fetching command line info from procfs")
-		return 'x'
+	except FileNotFoundError:
+		return '-'
 	except Exception:
 		_log.exception("failed on fetching command line info from procfs")
 		return 'x'
@@ -57,7 +54,7 @@ def _is_process_running_impl_posix(process_id, cmd_digest):  # pylint: disable=u
 	except OSError as e:
 		if e.errno == errno.ESRCH:
 			return False
-		elif e.errno == errno.EPERM:
+		if e.errno == errno.EPERM:
 			_log.warning("given PID %r exists but cannot be signal. treat as process still running.", process_id)
 			return True
 		raise
@@ -73,15 +70,15 @@ def _get_process_running_checker():
 # }}} routines for checking if process is running
 
 
-class ProcessIDFile(object):
+class ProcessIDFile:
 	def __init__(self, file_path, *args, **kwds):
-		super(ProcessIDFile, self).__init__(*args, **kwds)
+		super().__init__(*args, **kwds)
 		self.file_path = file_path
 		self._is_running_checker = _get_process_running_checker()
 
 	def fetch(self, check_running=False):
 		try:
-			with open(self.file_path, "r") as fp:
+			with open(self.file_path, "r", encoding="ascii") as fp:
 				process_id, cmd_digest = load_pid_file_content(fp)
 		except Exception as e:
 			_log.debug("cannot fetch content from PID file [%r] %r", self.file_path, e)
@@ -96,7 +93,7 @@ class ProcessIDFile(object):
 		cmd_digest = _digest_procfs_cmdline(process_id)
 		l0 = str(process_id) + "\n"
 		l1 = cmd_digest + "\n"
-		with open(self.file_path, "w") as fp:
+		with open(self.file_path, "w", encoding="ascii") as fp:
 			fp.write(l0)
 			fp.write(l1)
 
