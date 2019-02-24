@@ -5,7 +5,7 @@ from setuptools import setup  # pylint: disable=import-error
 
 setup(
 		name="commonutil-fileio-runtimerecord",
-		version="0.1.0",  # REV-CONSTANT:rev 5d022db7d38f580a850cd995e26a6c2f
+		version="3.0.1",  # REV-CONSTANT:rev 5d022db7d38f580a850cd995e26a6c2f
 		description="Collection of reord file modules for application development",
 		packages=[
 				"commonutil_fileio_runtimerecord",
