@@ -108,9 +108,11 @@ class ProcessIDFile:
 		except Exception:
 			_log.exception("failed on fetching process-id (check_running=%r)", check_running)
 			process_id = None
-		if process_id is None:
-			return
-		os.kill(process_id, sig)
+		if process_id is not None:
+			os.kill(process_id, sig)
+		else:
+			_log.debug("not sending signal since no PID loaded: %r", self.file_path)
+		return process_id
 
 	def remove(self):
 		try:
